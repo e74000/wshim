@@ -8,6 +8,7 @@ var update map[string]func(any)
 
 func Run(main func(), elements []InputElement) {
 	seen := make(map[string]bool)
+	update = make(map[string]func(any))
 
 	document := js.Global().Get("parent").Get("document")
 	optionPanel := document.Call("getElementById", "options")

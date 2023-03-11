@@ -13,7 +13,7 @@ func findValidId(Name, Type string) string {
 
 	for {
 		prefix = fmt.Sprintf("wshim-%s-%s-%d", Type, kebabCase(Name), count)
-		if ids[prefix] {
+		if !ids[prefix] {
 			ids[prefix] = true
 			return prefix
 		}

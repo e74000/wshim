@@ -1,6 +1,7 @@
 package wshim
 
 import (
+	"fmt"
 	"syscall/js"
 )
 
@@ -14,6 +15,8 @@ var update map[string]func(any)
 var ids = map[string]bool{}
 
 func Run(mainFunc func(), elements ...InputElement) {
+	fmt.Println("Running webshim")
+
 	seen := make(map[string]bool)
 	update = make(map[string]func(any))
 

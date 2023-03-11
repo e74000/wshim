@@ -1,6 +1,9 @@
 package wshim
 
-import "syscall/js"
+import (
+	"fmt"
+	"syscall/js"
+)
 
 func FloatSlider(name string, min, max, step float64, val *float64) *FloatSliderElement {
 	return &FloatSliderElement{
@@ -121,7 +124,7 @@ func (i *IntSliderElement) Update(this js.Value, params []js.Value) any {
 
 	update[id[:len(id)-1]](val)
 
-	document := js.Global().Get("parent").Get("document")
+	//document := js.Global().Get("parent").Get("document")
 
 	oId := ""
 
@@ -132,8 +135,10 @@ func (i *IntSliderElement) Update(this js.Value, params []js.Value) any {
 		oId = id[:len(id)-1] + "n"
 	}
 
-	other := document.Call("getElementById", oId)
-	other.Set("value", val)
+	fmt.Println(oId, id)
+
+	//other := document.Call("getElementById", oId)
+	//other.Set("value", val)
 
 	return nil
 }

@@ -6,8 +6,8 @@ import (
 
 type Toggle struct {
 	Name, Key string
-	val       *bool
-	init      bool
+	Val       *bool
+	Init      bool
 }
 
 func (t *Toggle) Build() (label, key, sType string, elems []js.Value) {
@@ -15,12 +15,12 @@ func (t *Toggle) Build() (label, key, sType string, elems []js.Value) {
 
 	toggle := document.Call("createElement", "input")
 	toggle.Call("setAttribute", "type", "checkbox")
-	toggle.Call("setAttribute", "checked", t.init)
+	toggle.Call("setAttribute", "checked", t.Init)
 	toggle.Call("setAttribute", "class", "optionToggle")
 
 	update[t.Key] = func(v any) {
 		b, _ := v.(bool)
-		*t.val = b
+		*t.Val = b
 	}
 
 	toggle.Call("setAttribute", "onclick", "ToggleUpdate(this.id, this.checked)")

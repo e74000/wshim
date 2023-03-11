@@ -113,7 +113,7 @@ func (i *IntSliderElement) Update(this js.Value, params []js.Value) any {
 	id := params[0].String()
 	val := params[1].Int()
 
-	update[id[:len(id)-1]](val)
+	update[id](val)
 
 	document := js.Global().Get("parent").Get("document")
 

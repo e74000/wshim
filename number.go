@@ -1,7 +1,6 @@
 package wshim
 
 import (
-	"fmt"
 	"syscall/js"
 )
 
@@ -31,13 +30,13 @@ func (s *FloatSliderElement) Build() (label, key, sType string, elems []js.Value
 	slider.Call("setAttribute", "max", s.Max)
 	slider.Call("setAttribute", "value", *s.Val)
 	slider.Call("setAttribute", "step", s.Step)
-	slider.Call("setAttribute", "id", s.Key+"s")
+	slider.Call("setAttribute", "id", s.Key)
 	slider.Call("setAttribute", "class", "optionSlider")
 
 	number := document.Call("createElement", "output")
 	number.Call("setAttribute", "type", "number")
 	number.Call("setAttribute", "value", *s.Val)
-	number.Call("setAttribute", "id", s.Key+"n")
+	number.Call("setAttribute", "id", s.Key+"-num")
 	number.Call("setAttribute", "class", "optionNumber")
 
 	update[s.Key] = func(v any) {
@@ -54,27 +53,12 @@ func (s *FloatSliderElement) Update(this js.Value, params []js.Value) any {
 	id := params[0].String()
 	val := params[1].Float()
 
-	update[id[:len(id)-1]](val)
+	update[id](val)
 
 	document := js.Global().Get("parent").Get("document")
 
-	oId := ""
-
-	switch id[0] {
-	case 'n':
-		oId = id[:len(id)-1] + "s"
-	case 's':
-		oId = id[:len(id)-1] + "n"
-	}
-
+	oId := id + "-num"
 	other := document.Call("getElementById", oId)
-
-	if other.IsNull() {
-		fmt.Println("WARNING: Failed to update float slider values:")
-		fmt.Println(id, id[:len(id)-1], oId)
-		return nil
-	}
-
 	other.Set("value", val)
 
 	return nil
@@ -106,13 +90,13 @@ func (i *IntSliderElement) Build() (label, key, sType string, elems []js.Value) 
 	slider.Call("setAttribute", "max", i.Max)
 	slider.Call("setAttribute", "value", *i.Val)
 	slider.Call("setAttribute", "step", i.Step)
-	slider.Call("setAttribute", "id", i.Key+"s")
+	slider.Call("setAttribute", "id", i.Key)
 	slider.Call("setAttribute", "class", "optionSlider")
 
 	number := document.Call("createElement", "output")
 	number.Call("setAttribute", "type", "number")
 	number.Call("setAttribute", "value", *i.Val)
-	number.Call("setAttribute", "id", i.Key+"n")
+	number.Call("setAttribute", "id", i.Key+"-num")
 	number.Call("setAttribute", "class", "optionNumber")
 
 	update[i.Key] = func(v any) {
@@ -133,23 +117,8 @@ func (i *IntSliderElement) Update(this js.Value, params []js.Value) any {
 
 	document := js.Global().Get("parent").Get("document")
 
-	oId := ""
-
-	switch id[0] {
-	case 'n':
-		oId = id[:len(id)-1] + "s"
-	case 's':
-		oId = id[:len(id)-1] + "n"
-	}
-
+	oId := id + "-num"
 	other := document.Call("getElementById", oId)
-
-	if other.IsNull() {
-		fmt.Println("WARNING: Failed to update float slider values:")
-		fmt.Println(id, id[:len(id)-1], oId)
-		return nil
-	}
-
 	other.Set("value", val)
 
 	return nil

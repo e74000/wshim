@@ -51,7 +51,7 @@ func (s *FloatSliderElement) Update(this js.Value, params []js.Value) any {
 	id := params[0].String()
 	val := params[1].Float()
 
-	update[id[1:]](val)
+	update[id[:len(id)-1]](val)
 
 	document := js.Global().Get("parent").Get("document")
 
@@ -59,9 +59,9 @@ func (s *FloatSliderElement) Update(this js.Value, params []js.Value) any {
 
 	switch id[0] {
 	case 'n':
-		oId = id[1:] + "s"
+		oId = id[:len(id)-1] + "s"
 	case 's':
-		oId = id[1:] + "n"
+		oId = id[:len(id)-1] + "n"
 	}
 
 	other := document.Call("getElementById", oId)
@@ -119,7 +119,7 @@ func (i *IntSliderElement) Update(this js.Value, params []js.Value) any {
 	id := params[0].String()
 	val := params[1].Int()
 
-	update[id[1:]](val)
+	update[id[:len(id)-1]](val)
 
 	document := js.Global().Get("parent").Get("document")
 
@@ -127,9 +127,9 @@ func (i *IntSliderElement) Update(this js.Value, params []js.Value) any {
 
 	switch id[0] {
 	case 'n':
-		oId = id[1:] + "s"
+		oId = id[:len(id)-1] + "s"
 	case 's':
-		oId = id[1:] + "n"
+		oId = id[:len(id)-1] + "n"
 	}
 
 	other := document.Call("getElementById", oId)

@@ -2,27 +2,38 @@ package wshim
 
 import "syscall/js"
 
-type FloatSlider struct {
-	Name, Key            string
-	Min, Max, Init, Step float64
-	Val                  *float64
+func FloatSlider(name string, min, max, step float64, val *float64) *FloatSliderElement {
+	return &FloatSliderElement{
+		Name: name,
+		Key:  findValidId(name, "FloatSlider"),
+		Min:  min,
+		Max:  max,
+		Step: step,
+		Val:  val,
+	}
 }
 
-func (s *FloatSlider) Build() (label, key, sType string, elems []js.Value) {
+type FloatSliderElement struct {
+	Name, Key      string
+	Min, Max, Step float64
+	Val            *float64
+}
+
+func (s *FloatSliderElement) Build() (label, key, sType string, elems []js.Value) {
 	document := js.Global().Get("parent").Get("document")
 
 	slider := document.Call("createElement", "input")
 	slider.Call("setAttribute", "type", "range")
 	slider.Call("setAttribute", "min", s.Min)
 	slider.Call("setAttribute", "max", s.Max)
-	slider.Call("setAttribute", "value", s.Init)
+	slider.Call("setAttribute", "value", *s.Val)
 	slider.Call("setAttribute", "step", s.Step)
 	slider.Call("setAttribute", "id", "s"+s.Key)
 	slider.Call("setAttribute", "class", "optionSlider")
 
 	number := document.Call("createElement", "output")
 	number.Call("setAttribute", "type", "number")
-	number.Call("setAttribute", "value", s.Init)
+	number.Call("setAttribute", "value", *s.Val)
 	number.Call("setAttribute", "id", "n"+s.Key)
 	number.Call("setAttribute", "class", "optionNumber")
 
@@ -33,10 +44,10 @@ func (s *FloatSlider) Build() (label, key, sType string, elems []js.Value) {
 
 	slider.Call("setAttribute", "oninput", "FloatSliderUpdate(this.id, parseFloat(this.value))")
 
-	return s.Name, s.Key, "FloatSlider", []js.Value{slider, number}
+	return s.Name, s.Key, "FloatSliderElement", []js.Value{slider, number}
 }
 
-func (s *FloatSlider) Update(this js.Value, params []js.Value) any {
+func (s *FloatSliderElement) Update(this js.Value, params []js.Value) any {
 	id := params[0].String()
 	val := params[1].Float()
 
@@ -59,27 +70,38 @@ func (s *FloatSlider) Update(this js.Value, params []js.Value) any {
 	return nil
 }
 
-type IntSlider struct {
-	Name, Key            string
-	Min, Max, Init, Step int
-	Val                  *int
+func IntSlider(name string, min, max, step int, val *int) *IntSliderElement {
+	return &IntSliderElement{
+		Name: name,
+		Key:  findValidId(name, "IntSlider"),
+		Min:  min,
+		Max:  max,
+		Step: step,
+		Val:  val,
+	}
 }
 
-func (i *IntSlider) Build() (label, key, sType string, elems []js.Value) {
+type IntSliderElement struct {
+	Name, Key      string
+	Min, Max, Step int
+	Val            *int
+}
+
+func (i *IntSliderElement) Build() (label, key, sType string, elems []js.Value) {
 	document := js.Global().Get("parent").Get("document")
 
 	slider := document.Call("createElement", "input")
 	slider.Call("setAttribute", "type", "range")
 	slider.Call("setAttribute", "min", i.Min)
 	slider.Call("setAttribute", "max", i.Max)
-	slider.Call("setAttribute", "value", i.Init)
+	slider.Call("setAttribute", "value", *i.Val)
 	slider.Call("setAttribute", "step", i.Step)
 	slider.Call("setAttribute", "id", "i"+i.Key)
 	slider.Call("setAttribute", "class", "optionSlider")
 
 	number := document.Call("createElement", "output")
 	number.Call("setAttribute", "type", "number")
-	number.Call("setAttribute", "value", i.Init)
+	number.Call("setAttribute", "value", *i.Val)
 	number.Call("setAttribute", "id", "n"+i.Key)
 	number.Call("setAttribute", "class", "optionNumber")
 
@@ -88,12 +110,12 @@ func (i *IntSlider) Build() (label, key, sType string, elems []js.Value) {
 		*i.Val = vi
 	}
 
-	slider.Call("setAttribute", "oninput", "IntSlider(this.id, parseInt(this.value))")
+	slider.Call("setAttribute", "oninput", "IntSliderElement(this.id, parseInt(this.value))")
 
-	return i.Name, i.Key, "IntSlider", []js.Value{slider, number}
+	return i.Name, i.Key, "IntSliderElement", []js.Value{slider, number}
 }
 
-func (i *IntSlider) Update(this js.Value, params []js.Value) any {
+func (i *IntSliderElement) Update(this js.Value, params []js.Value) any {
 	id := params[0].String()
 	val := params[1].Int()
 

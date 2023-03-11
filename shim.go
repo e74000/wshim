@@ -11,6 +11,8 @@ type InputElement interface {
 
 var update map[string]func(any)
 
+var ids = map[string]bool{}
+
 func Run(mainFunc func(), elements ...InputElement) {
 	seen := make(map[string]bool)
 	update = make(map[string]func(any))

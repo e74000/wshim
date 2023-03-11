@@ -4,17 +4,25 @@ import (
 	"syscall/js"
 )
 
-type Toggle struct {
+func Toggle(name string, val *bool) *ToggleElement {
+	return &ToggleElement{
+		Name: name,
+		Key:  findValidId(name, "Toggle"),
+		Val:  val,
+	}
+}
+
+type ToggleElement struct {
 	Name, Key string
 	Val       *bool
 }
 
-func (t *Toggle) Build() (label, key, sType string, elems []js.Value) {
+func (t *ToggleElement) Build() (label, key, sType string, elems []js.Value) {
 	document := js.Global().Get("parent").Get("document")
 
 	toggle := document.Call("createElement", "input")
 	toggle.Call("setAttribute", "type", "checkbox")
-	toggle.Call("setAttribute", "checked", *t.Val)
+	toggle.Call("setAttribute", "checked", checked(*t.Val))
 	toggle.Call("setAttribute", "id", t.Key)
 	toggle.Call("setAttribute", "class", "optionToggle")
 
@@ -25,10 +33,10 @@ func (t *Toggle) Build() (label, key, sType string, elems []js.Value) {
 
 	toggle.Call("setAttribute", "onclick", "ToggleUpdate(this.id, this.checked)")
 
-	return t.Name, t.Key, "Toggle", []js.Value{toggle}
+	return t.Name, t.Key, "ToggleElement", []js.Value{toggle}
 }
 
-func (t *Toggle) Update(this js.Value, params []js.Value) any {
+func (t *ToggleElement) Update(this js.Value, params []js.Value) any {
 	id := params[0].String()
 	val := params[1].Bool()
 

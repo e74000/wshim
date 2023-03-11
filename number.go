@@ -68,6 +68,13 @@ func (s *FloatSliderElement) Update(this js.Value, params []js.Value) any {
 	}
 
 	other := document.Call("getElementById", oId)
+
+	if other.IsNull() {
+		fmt.Println("WARNING: Failed to update float slider values:")
+		fmt.Println(id, id[:len(id)-1], oId)
+		return nil
+	}
+
 	other.Set("value", val)
 
 	return nil
@@ -124,7 +131,7 @@ func (i *IntSliderElement) Update(this js.Value, params []js.Value) any {
 
 	update[id[:len(id)-1]](val)
 
-	//document := js.Global().Get("parent").Get("document")
+	document := js.Global().Get("parent").Get("document")
 
 	oId := ""
 
@@ -135,10 +142,15 @@ func (i *IntSliderElement) Update(this js.Value, params []js.Value) any {
 		oId = id[:len(id)-1] + "n"
 	}
 
-	fmt.Println(oId, id)
+	other := document.Call("getElementById", oId)
 
-	//other := document.Call("getElementById", oId)
-	//other.Set("value", val)
+	if other.IsNull() {
+		fmt.Println("WARNING: Failed to update float slider values:")
+		fmt.Println(id, id[:len(id)-1], oId)
+		return nil
+	}
+
+	other.Set("value", val)
 
 	return nil
 }

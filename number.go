@@ -110,7 +110,7 @@ func (i *IntSliderElement) Build() (label, key, sType string, elems []js.Value) 
 		*i.Val = vi
 	}
 
-	slider.Call("setAttribute", "oninput", "IntSliderElement(this.id, parseInt(this.value))")
+	slider.Call("setAttribute", "oninput", "IntSliderElementUpdate(this.id, parseInt(this.value))")
 
 	return i.Name, i.Key, "IntSliderElement", []js.Value{slider, number}
 }

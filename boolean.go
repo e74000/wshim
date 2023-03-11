@@ -31,7 +31,7 @@ func (t *ToggleElement) Build() (label, key, sType string, elems []js.Value) {
 		*t.Val = b
 	}
 
-	toggle.Call("setAttribute", "onclick", "ToggleUpdate(this.id, this.checked)")
+	toggle.Call("setAttribute", "onclick", "ToggleElementUpdate(this.id, this.checked)")
 
 	return t.Name, t.Key, "ToggleElement", []js.Value{toggle}
 }

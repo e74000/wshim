@@ -28,13 +28,13 @@ func (s *FloatSliderElement) Build() (label, key, sType string, elems []js.Value
 	slider.Call("setAttribute", "max", s.Max)
 	slider.Call("setAttribute", "value", *s.Val)
 	slider.Call("setAttribute", "step", s.Step)
-	slider.Call("setAttribute", "id", "s"+s.Key)
+	slider.Call("setAttribute", "id", s.Key+"s")
 	slider.Call("setAttribute", "class", "optionSlider")
 
 	number := document.Call("createElement", "output")
 	number.Call("setAttribute", "type", "number")
 	number.Call("setAttribute", "value", *s.Val)
-	number.Call("setAttribute", "id", "n"+s.Key)
+	number.Call("setAttribute", "id", s.Key+"n")
 	number.Call("setAttribute", "class", "optionNumber")
 
 	update[s.Key] = func(v any) {
@@ -59,9 +59,9 @@ func (s *FloatSliderElement) Update(this js.Value, params []js.Value) any {
 
 	switch id[0] {
 	case 'n':
-		oId = "s" + id[1:]
+		oId = id[1:] + "s"
 	case 's':
-		oId = "n" + id[1:]
+		oId = id[1:] + "n"
 	}
 
 	other := document.Call("getElementById", oId)
@@ -96,13 +96,13 @@ func (i *IntSliderElement) Build() (label, key, sType string, elems []js.Value) 
 	slider.Call("setAttribute", "max", i.Max)
 	slider.Call("setAttribute", "value", *i.Val)
 	slider.Call("setAttribute", "step", i.Step)
-	slider.Call("setAttribute", "id", "i"+i.Key)
+	slider.Call("setAttribute", "id", i.Key+"s")
 	slider.Call("setAttribute", "class", "optionSlider")
 
 	number := document.Call("createElement", "output")
 	number.Call("setAttribute", "type", "number")
 	number.Call("setAttribute", "value", *i.Val)
-	number.Call("setAttribute", "id", "n"+i.Key)
+	number.Call("setAttribute", "id", i.Key+"n")
 	number.Call("setAttribute", "class", "optionNumber")
 
 	update[i.Key] = func(v any) {
@@ -127,9 +127,9 @@ func (i *IntSliderElement) Update(this js.Value, params []js.Value) any {
 
 	switch id[0] {
 	case 'n':
-		oId = "s" + id[1:]
+		oId = id[1:] + "s"
 	case 's':
-		oId = "n" + id[1:]
+		oId = id[1:] + "n"
 	}
 
 	other := document.Call("getElementById", oId)

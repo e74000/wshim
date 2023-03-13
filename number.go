@@ -82,8 +82,9 @@ type IntSliderElement struct {
 	onChange       func(oldVal, newVal int)
 }
 
-func (i *IntSliderElement) OnChange(f func(oldVal, newVal int)) {
+func (i *IntSliderElement) OnChange(f func(oldVal, newVal int)) *IntSliderElement {
 	i.onChange = f
+	return i
 }
 
 func (i *IntSliderElement) Build() (label, key, sType string, elems []js.Value) {

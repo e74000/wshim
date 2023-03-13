@@ -79,6 +79,11 @@ type IntSliderElement struct {
 	Name, Key      string
 	Min, Max, Step int
 	Val            *int
+	onChange       func(oldVal, newVal int)
+}
+
+func (i *IntSliderElement) OnChange(f func(oldVal, newVal int)) {
+	i.onChange = f
 }
 
 func (i *IntSliderElement) Build() (label, key, sType string, elems []js.Value) {
@@ -100,6 +105,10 @@ func (i *IntSliderElement) Build() (label, key, sType string, elems []js.Value) 
 	number.Call("setAttribute", "class", "optionNumber")
 
 	update[i.Key] = func(v any) {
+		if i.onChange != nil {
+			i.onChange(*i.Val, v.(int))
+		}
+
 		vi, _ := v.(int)
 		*i.Val = vi
 	}

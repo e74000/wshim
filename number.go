@@ -45,6 +45,7 @@ func (s *FloatSliderElement) Build() (label, key, sType string, elems []js.Value
 	}
 
 	slider.Call("setAttribute", "oninput", "FloatSliderElementUpdate(this.id, parseFloat(this.value))")
+	slider.Call("FloatSliderElementUpdate", s.Key, *s.Val)
 
 	return s.Name, s.Key, "FloatSliderElement", []js.Value{slider, number}
 }

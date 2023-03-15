@@ -2,6 +2,7 @@ package wshim
 
 import (
 	"fmt"
+	"log"
 	"syscall/js"
 )
 
@@ -31,6 +32,11 @@ func (t *ToggleElement) Build() (label, key, sType string, elems []js.Value) {
 	toggle.Call("setAttribute", "type", "checkbox")
 	toggle.Call("setAttribute", "id", t.Key)
 	toggle.Call("setAttribute", "class", "optionToggle")
+
+	if debug {
+		log.Println("Building toggle element with parameters:", t.Name, t.Key)
+		log.Println("Initial value of", *t.Val, "registered")
+	}
 
 	if *t.Val {
 		toggle.Call("setAttribute", "defaultChecked", checked(*t.Val))
@@ -92,9 +98,19 @@ func (r *RadioElement) Build() (label, key, sType string, elems []js.Value) {
 		}
 	}
 
+	if debug {
+		log.Println("Building radio element with parameters:", r.Name, r.Key, r.Vals)
+	}
+
 	if startIndex == -1 {
+		if debug {
+			log.Println("Starting value of", *r.Val, "invalid, defaulting to", r.Vals[0])
+		}
+
 		startIndex = 0
 		*r.Val = r.Vals[0]
+	} else if debug {
+		log.Println("Starting value of", *r.Val, "registered...")
 	}
 
 	elems = make([]js.Value, 3*len(r.Vals))

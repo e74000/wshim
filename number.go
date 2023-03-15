@@ -1,6 +1,7 @@
 package wshim
 
 import (
+	"log"
 	"syscall/js"
 )
 
@@ -28,6 +29,21 @@ func (s *FloatSliderElement) Build() (label, key, sType string, elems []js.Value
 	slider.Call("setAttribute", "type", "range")
 	slider.Call("setAttribute", "min", s.Min)
 	slider.Call("setAttribute", "max", s.Max)
+
+	if debug {
+		log.Println("Building toggle element with parameters:", s.Name, s.Key, s.Min, s.Max, s.Step)
+
+	}
+
+	if *s.Val > s.Max || *s.Val < s.Min {
+		if debug {
+			log.Println("Initial value for slider", *s.Val, "outside of slider range, clamping to", clamp(*s.Val, s.Min, s.Max))
+		}
+		*s.Val = clamp(*s.Val, s.Min, s.Max)
+	} else if debug {
+		log.Println("Initial value of", *s.Val, "registered")
+	}
+
 	slider.Call("setAttribute", "value", *s.Val)
 	slider.Call("setAttribute", "step", s.Step)
 	slider.Call("setAttribute", "id", s.Key)
@@ -94,6 +110,21 @@ func (i *IntSliderElement) Build() (label, key, sType string, elems []js.Value) 
 	slider.Call("setAttribute", "type", "range")
 	slider.Call("setAttribute", "min", i.Min)
 	slider.Call("setAttribute", "max", i.Max)
+
+	if debug {
+		log.Println("Building toggle element with parameters:", i.Name, i.Key, i.Min, i.Max, i.Step)
+
+	}
+
+	if *i.Val > i.Max || *i.Val < i.Min {
+		if debug {
+			log.Println("Initial value for slider", *i.Val, "outside of slider range, clamping to", clamp(*i.Val, i.Min, i.Max))
+		}
+		*i.Val = clamp(*i.Val, i.Min, i.Max)
+	} else if debug {
+		log.Println("Initial value of", *i.Val, "registered")
+	}
+
 	slider.Call("setAttribute", "value", *i.Val)
 	slider.Call("setAttribute", "step", i.Step)
 	slider.Call("setAttribute", "id", i.Key)

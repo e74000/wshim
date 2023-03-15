@@ -33,3 +33,14 @@ func checked(b bool) string {
 		return "unchecked"
 	}
 }
+
+// There should be a builtin interface for this lol
+func clamp[T int | uint | int8 | int16 | int32 | int64 | uint8 | uint16 | uint32 | uint64 | float32 | float64](v, min, max T) T {
+	if v < min {
+		return min
+	} else if v > max {
+		return max
+	} else {
+		return v
+	}
+}

@@ -1,6 +1,7 @@
 package wshim
 
 import (
+	"fmt"
 	"log"
 	"syscall/js"
 )
@@ -55,6 +56,8 @@ func (s *FloatSliderElement) Build() (label, key, sType string, elems []js.Value
 	number.Call("setAttribute", "id", s.Key+"-num")
 	number.Call("setAttribute", "class", "optionNumber")
 
+	number.Call("appendChildNode", document.Call("createTextNode", fmt.Sprintf("%.2f", *s.Val)))
+
 	update[s.Key] = func(v any) {
 		f, _ := v.(float64)
 		*s.Val = f
@@ -98,59 +101,61 @@ type IntSliderElement struct {
 	onChange       func(oldVal, newVal int)
 }
 
-func (i *IntSliderElement) OnChange(f func(oldVal, newVal int)) *IntSliderElement {
-	i.onChange = f
-	return i
+func (s *IntSliderElement) OnChange(f func(oldVal, newVal int)) *IntSliderElement {
+	s.onChange = f
+	return s
 }
 
-func (i *IntSliderElement) Build() (label, key, sType string, elems []js.Value) {
+func (s *IntSliderElement) Build() (label, key, sType string, elems []js.Value) {
 	document := js.Global().Get("parent").Get("document")
 
 	slider := document.Call("createElement", "input")
 	slider.Call("setAttribute", "type", "range")
-	slider.Call("setAttribute", "min", i.Min)
-	slider.Call("setAttribute", "max", i.Max)
+	slider.Call("setAttribute", "min", s.Min)
+	slider.Call("setAttribute", "max", s.Max)
 
 	if debug {
-		log.Println("Building int slider element with parameters:", i.Name, i.Key, i.Min, i.Max, i.Step)
+		log.Println("Building int slider element with parameters:", s.Name, s.Key, s.Min, s.Max, s.Step)
 
 	}
 
-	if *i.Val > i.Max || *i.Val < i.Min {
+	if *s.Val > s.Max || *s.Val < s.Min {
 		if debug {
-			log.Println("Initial value for slider", *i.Val, "outside of slider range, clamping to", clamp(*i.Val, i.Min, i.Max))
+			log.Println("Initial value for slider", *s.Val, "outside of slider range, clamping to", clamp(*s.Val, s.Min, s.Max))
 		}
-		*i.Val = clamp(*i.Val, i.Min, i.Max)
+		*s.Val = clamp(*s.Val, s.Min, s.Max)
 	} else if debug {
-		log.Println("Initial value of", *i.Val, "registered")
+		log.Println("Initial value of", *s.Val, "registered")
 	}
 
-	slider.Call("setAttribute", "value", *i.Val)
-	slider.Call("setAttribute", "step", i.Step)
-	slider.Call("setAttribute", "id", i.Key)
+	slider.Call("setAttribute", "value", *s.Val)
+	slider.Call("setAttribute", "step", s.Step)
+	slider.Call("setAttribute", "id", s.Key)
 	slider.Call("setAttribute", "class", "optionSlider")
 
 	number := document.Call("createElement", "output")
 	number.Call("setAttribute", "type", "number")
-	number.Call("setAttribute", "value", *i.Val)
-	number.Call("setAttribute", "id", i.Key+"-num")
+	number.Call("setAttribute", "value", *s.Val)
+	number.Call("setAttribute", "id", s.Key+"-num")
 	number.Call("setAttribute", "class", "optionNumber")
 
-	update[i.Key] = func(v any) {
-		if i.onChange != nil {
-			i.onChange(*i.Val, v.(int))
+	number.Call("appendChildNode", document.Call("createTextNode", fmt.Sprintf("%d", *s.Val)))
+
+	update[s.Key] = func(v any) {
+		if s.onChange != nil {
+			s.onChange(*s.Val, v.(int))
 		}
 
 		vi, _ := v.(int)
-		*i.Val = vi
+		*s.Val = vi
 	}
 
 	slider.Call("setAttribute", "oninput", "IntSliderElementUpdate(this.id, parseInt(this.value))")
 
-	return i.Name, i.Key, "IntSliderElement", []js.Value{slider, number}
+	return s.Name, s.Key, "IntSliderElement", []js.Value{slider, number}
 }
 
-func (i *IntSliderElement) Update(this js.Value, params []js.Value) any {
+func (s *IntSliderElement) Update(this js.Value, params []js.Value) any {
 	id := params[0].String()
 	val := params[1].Int()
 

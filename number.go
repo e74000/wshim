@@ -31,7 +31,7 @@ func (s *FloatSliderElement) Build() (label, key, sType string, elems []js.Value
 	slider.Call("setAttribute", "max", s.Max)
 
 	if debug {
-		log.Println("Building toggle element with parameters:", s.Name, s.Key, s.Min, s.Max, s.Step)
+		log.Println("Building float slider element with parameters:", s.Name, s.Key, s.Min, s.Max, s.Step)
 
 	}
 
@@ -112,7 +112,7 @@ func (i *IntSliderElement) Build() (label, key, sType string, elems []js.Value) 
 	slider.Call("setAttribute", "max", i.Max)
 
 	if debug {
-		log.Println("Building toggle element with parameters:", i.Name, i.Key, i.Min, i.Max, i.Step)
+		log.Println("Building int slider element with parameters:", i.Name, i.Key, i.Min, i.Max, i.Step)
 
 	}
 

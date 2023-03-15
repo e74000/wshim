@@ -56,7 +56,7 @@ func (s *FloatSliderElement) Build() (label, key, sType string, elems []js.Value
 	number.Call("setAttribute", "id", s.Key+"-num")
 	number.Call("setAttribute", "class", "optionNumber")
 
-	number.Call("appendChildNode", document.Call("createTextNode", fmt.Sprintf("%.2f", *s.Val)))
+	number.Call("appendChild", document.Call("createTextNode", fmt.Sprintf("%.2f", *s.Val)))
 
 	update[s.Key] = func(v any) {
 		f, _ := v.(float64)
@@ -139,7 +139,7 @@ func (s *IntSliderElement) Build() (label, key, sType string, elems []js.Value) 
 	number.Call("setAttribute", "id", s.Key+"-num")
 	number.Call("setAttribute", "class", "optionNumber")
 
-	number.Call("appendChildNode", document.Call("createTextNode", fmt.Sprintf("%d", *s.Val)))
+	number.Call("appendChild", document.Call("createTextNode", fmt.Sprintf("%d", *s.Val)))
 
 	update[s.Key] = func(v any) {
 		if s.onChange != nil {

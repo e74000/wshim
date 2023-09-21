@@ -2,10 +2,11 @@ package wshim
 
 import (
 	"fmt"
-	"log"
+	"github.com/charmbracelet/log"
 	"syscall/js"
 )
 
+// FloatSlider creates a new FloatSliderElement
 func FloatSlider(name string, min, max, step float64, val *float64) *FloatSliderElement {
 	return &FloatSliderElement{
 		Name: name,
@@ -17,12 +18,14 @@ func FloatSlider(name string, min, max, step float64, val *float64) *FloatSlider
 	}
 }
 
+// FloatSliderElement is a slider element that stores a float value
 type FloatSliderElement struct {
 	Name, Key      string
 	Min, Max, Step float64
 	Val            *float64
 }
 
+// Build returns the []js.Value for the float slider input element as well as some identifiers.
 func (s *FloatSliderElement) Build() (label, key, sType string, elems []js.Value) {
 	document := js.Global().Get("parent").Get("document")
 
@@ -31,18 +34,16 @@ func (s *FloatSliderElement) Build() (label, key, sType string, elems []js.Value
 	slider.Call("setAttribute", "min", s.Min)
 	slider.Call("setAttribute", "max", s.Max)
 
-	if debug {
-		log.Println("Building float slider element with parameters:", s.Name, s.Key, s.Min, s.Max, s.Step)
-
-	}
+	log.Debug("building float slider element with parameters:", "name", s.Name, "key", s.Key, "min", s.Min, "max", s.Max, "step", s.Step)
 
 	if *s.Val > s.Max || *s.Val < s.Min {
-		if debug {
-			log.Println("Initial value for slider", *s.Val, "outside of slider range, clamping to", clamp(*s.Val, s.Min, s.Max))
-		}
-		*s.Val = clamp(*s.Val, s.Min, s.Max)
-	} else if debug {
-		log.Println("Initial value of", *s.Val, "registered")
+		clamped := clamp(*s.Val, s.Min, s.Max)
+
+		log.Debug("initial value is out of range, clamping:", "initial", *s.Val, "clamped", clamped)
+
+		*s.Val = clamped
+	} else {
+		log.Debug("initial value registered:", "initial", *s.Val)
 	}
 
 	slider.Call("setAttribute", "value", *s.Val)
@@ -68,6 +69,7 @@ func (s *FloatSliderElement) Build() (label, key, sType string, elems []js.Value
 	return s.Name, s.Key, "FloatSliderElement", []js.Value{slider, number}
 }
 
+// Update updates the value of the float slider input element.
 func (s *FloatSliderElement) Update(this js.Value, params []js.Value) any {
 	id := params[0].String()
 	val := params[1].Float()
@@ -83,6 +85,7 @@ func (s *FloatSliderElement) Update(this js.Value, params []js.Value) any {
 	return nil
 }
 
+// IntSlider creates a new IntSliderElement
 func IntSlider(name string, min, max, step int, val *int) *IntSliderElement {
 	return &IntSliderElement{
 		Name: name,
@@ -94,6 +97,7 @@ func IntSlider(name string, min, max, step int, val *int) *IntSliderElement {
 	}
 }
 
+// IntSliderElement is a slider element that stores an integer value
 type IntSliderElement struct {
 	Name, Key      string
 	Min, Max, Step int
@@ -101,11 +105,13 @@ type IntSliderElement struct {
 	onChange       func(oldVal, newVal int)
 }
 
+// OnChange registers a callback function that is called when the value of the int slider changes.
 func (s *IntSliderElement) OnChange(f func(oldVal, newVal int)) *IntSliderElement {
 	s.onChange = f
 	return s
 }
 
+// Build returns the []js.Value for the int slider input element as well as some identifiers.
 func (s *IntSliderElement) Build() (label, key, sType string, elems []js.Value) {
 	document := js.Global().Get("parent").Get("document")
 
@@ -114,18 +120,16 @@ func (s *IntSliderElement) Build() (label, key, sType string, elems []js.Value) 
 	slider.Call("setAttribute", "min", s.Min)
 	slider.Call("setAttribute", "max", s.Max)
 
-	if debug {
-		log.Println("Building int slider element with parameters:", s.Name, s.Key, s.Min, s.Max, s.Step)
-
-	}
+	log.Debug("building integer slider element with parameters:", "name", s.Name, "key", "min", s.Min, "max", s.Max, "step", s.Step)
 
 	if *s.Val > s.Max || *s.Val < s.Min {
-		if debug {
-			log.Println("Initial value for slider", *s.Val, "outside of slider range, clamping to", clamp(*s.Val, s.Min, s.Max))
-		}
+		clamped := clamp(*s.Val, s.Min, s.Max)
+
+		log.Debug("initial value is out of range, clamping:", "initial", *s.Val, "clamped", clamped)
+
 		*s.Val = clamp(*s.Val, s.Min, s.Max)
-	} else if debug {
-		log.Println("Initial value of", *s.Val, "registered")
+	} else {
+		log.Debug("initial value registered:", "initial", *s.Val)
 	}
 
 	slider.Call("setAttribute", "value", *s.Val)
@@ -155,6 +159,7 @@ func (s *IntSliderElement) Build() (label, key, sType string, elems []js.Value) 
 	return s.Name, s.Key, "IntSliderElement", []js.Value{slider, number}
 }
 
+// Update updates the value of the integer slider input element.
 func (s *IntSliderElement) Update(this js.Value, params []js.Value) any {
 	id := params[0].String()
 	val := params[1].Int()

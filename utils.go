@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+// findValidId returns a valid id for a given name and type.
 func findValidId(Name, Type string) string {
 	var (
 		prefix string
@@ -22,10 +23,12 @@ func findValidId(Name, Type string) string {
 	}
 }
 
+// kebabCase converts a string to kebab-case.
 func kebabCase(input string) string {
 	return strings.Replace(input, " ", "-", -1)
 }
 
+// checked formats a boolean for checkbox elements
 func checked(b bool) string {
 	if b {
 		return "checked"
@@ -34,7 +37,7 @@ func checked(b bool) string {
 	}
 }
 
-// There should be a builtin interface for this lol
+// clamp clamps a value between min and max.
 func clamp[T int | uint | int8 | int16 | int32 | int64 | uint8 | uint16 | uint32 | uint64 | float32 | float64](v, min, max T) T {
 	if v < min {
 		return min

@@ -41,9 +41,19 @@ func Run(mainFunc func(), elements ...InputElement) {
 	// get the parent document object, and from it the options panel for the page
 	parentDocument := js.Global().Get("parent").Get("parentDocument")
 
-	// If the parent document is null then the page is not inside an iframe.
+	// If the parent document is not defined, the page may not have been loaded yet.
+	retryStart := time.Now()
+	for checkUndefined(parentDocument) && time.Since(retryStart) <= timeout {
+		log.Debug("parent document not found, retrying...")
+		parentDocument = js.Global().Get("parent").Get("parentDocument")
+		time.Sleep(100 * time.Millisecond)
+	}
+
+	// If the parent document is null then the page is likely not inside an iframe.
 	// In this case the program should run, but the elements should not be added.
-	if parentDocument.IsNull() {
+	if checkUndefined(parentDocument) {
+		log.Error("parent document not found, running without options...")
+
 		// Run the main function.
 		mainFunc()
 
@@ -57,16 +67,23 @@ func Run(mainFunc func(), elements ...InputElement) {
 	optionsPanel := parentDocument.Call("getElementById", "options")
 
 	// If the optionsPanel is null, then the page has not been loaded yet, wait for it to load and try again.
-	retryStart := time.Now()
-	for optionsPanel.IsNull() && time.Since(retryStart) <= timeout {
+	retryStart = time.Now()
+	for checkUndefined(optionsPanel) && time.Since(retryStart) <= timeout {
 		log.Debug("options panel not found, retrying...")
 		optionsPanel = parentDocument.Call("getElementById", "options")
 		time.Sleep(100 * time.Millisecond)
 	}
 
 	// If the optionsPanel is still null, throw an error.
-	if optionsPanel.IsNull() {
-		log.Fatal("timeout when when waiting for options panel")
+	if checkUndefined(optionsPanel) {
+		log.Error("options panel not found, running without options...")
+
+		// Run the main function.
+		mainFunc()
+
+		// Wait for the program to exit.
+		<-make(chan bool)
+
 		return
 	}
 

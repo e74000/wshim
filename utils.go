@@ -3,6 +3,7 @@ package wshim
 import (
 	"fmt"
 	"strings"
+	"syscall/js"
 )
 
 // findValidId returns a valid id for a given name and type.
@@ -46,4 +47,9 @@ func clamp[T int | uint | int8 | int16 | int32 | int64 | uint8 | uint16 | uint32
 	} else {
 		return v
 	}
+}
+
+// checkUndefined returns true if a js.Value is undefined, null or NaN
+func checkUndefined(v js.Value) bool {
+	return v.IsUndefined() || v.IsNull() || v.IsNaN()
 }

@@ -6,6 +6,10 @@ import (
 	"time"
 )
 
+const (
+	timeout = 10 * time.Second
+)
+
 // InputElement is an interface that represents an input element.
 type InputElement interface {
 	Build() (label, key, sType string, elems []js.Value)
@@ -18,20 +22,53 @@ var update map[string]func(any)
 // ids is a map of ids that are currently in use.
 var ids = map[string]bool{}
 
+// SetLogLevel sets the log level of the program.
+func SetLogLevel(level log.Level) {
+	log.SetLevel(level)
+}
+
 // Run runs the main function with the given elements.
 func Run(mainFunc func(), elements ...InputElement) {
 	log.Debug("program started...")
 
 	// Store the time that the program started.
-	start := time.Now()
+	programStart := time.Now()
 
 	// Create a map of known elements and update callbacks
 	seen := make(map[string]bool)
 	update = make(map[string]func(any))
 
-	// get the document object, and from it the options panel for the page
-	document := js.Global().Get("parent").Get("document")
-	optionPanel := document.Call("getElementById", "options")
+	// get the parent document object, and from it the options panel for the page
+	parentDocument := js.Global().Get("parent").Get("parentDocument")
+
+	// If the parent document is null then the page is not inside an iframe.
+	// In this case the program should run, but the elements should not be added.
+	if parentDocument.IsNull() {
+		// Run the main function.
+		mainFunc()
+
+		// Wait for the program to exit.
+		<-make(chan bool)
+
+		return
+	}
+
+	// Get the options panel, if the page is inside an iframe.
+	optionsPanel := parentDocument.Call("getElementById", "options")
+
+	// If the optionsPanel is null, then the page has not been loaded yet, wait for it to load and try again.
+	retryStart := time.Now()
+	for optionsPanel.IsNull() && time.Since(retryStart) <= timeout {
+		log.Debug("options panel not found, retrying...")
+		optionsPanel = parentDocument.Call("getElementById", "options")
+		time.Sleep(100 * time.Millisecond)
+	}
+
+	// If the optionsPanel is still null, throw an error.
+	if optionsPanel.IsNull() {
+		log.Fatal("timeout when when waiting for options panel")
+		return
+	}
 
 	log.Debug("begin building interface...")
 
@@ -54,17 +91,17 @@ func Run(mainFunc func(), elements ...InputElement) {
 		}
 
 		// Create the label for the element
-		label := document.Call("createElement", "label")
+		label := parentDocument.Call("createElement", "label")
 		label.Call("setAttribute", "for", k)
 		label.Call("setAttribute", "class", "optionLabel")
-		label.Call("appendChild", document.Call("createTextNode", l))
+		label.Call("appendChild", parentDocument.Call("createTextNode", l))
 
 		// Create the option element
-		option := document.Call("createElement", "div")
+		option := parentDocument.Call("createElement", "div")
 		option.Call("setAttribute", "class", "option")
 
 		// Create the input box
-		inputBox := document.Call("createElement", "div")
+		inputBox := parentDocument.Call("createElement", "div")
 		inputBox.Call("setAttribute", "class", "inputBox")
 
 		// Put all the elements into the input box
@@ -77,10 +114,10 @@ func Run(mainFunc func(), elements ...InputElement) {
 		option.Call("appendChild", inputBox)
 
 		// Put the option into the options panel
-		optionPanel.Call("appendChild", option)
+		optionsPanel.Call("appendChild", option)
 	}
 
-	log.Debug("done building interface...", "time", time.Since(start).String())
+	log.Debug("done building interface...", "time", time.Since(programStart).String())
 
 	// Run the main function
 	mainFunc()

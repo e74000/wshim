@@ -39,13 +39,13 @@ func Run(mainFunc func(), elements ...InputElement) {
 	update = make(map[string]func(any))
 
 	// get the parent document object, and from it the options panel for the page
-	parentDocument := js.Global().Get("parent").Get("parentDocument")
+	parentDocument := js.Global().Get("parent").Get("document")
 
 	// If the parent document is not defined, the page may not have been loaded yet.
 	retryStart := time.Now()
 	for checkUndefined(parentDocument) && time.Since(retryStart) <= timeout {
 		log.Debug("parent document not found, retrying...")
-		parentDocument = js.Global().Get("parent").Get("parentDocument")
+		parentDocument = js.Global().Get("parent").Get("document")
 		time.Sleep(100 * time.Millisecond)
 	}
 
